@@ -53,34 +53,38 @@ export class ReportPage {
     projectHeadRole_btn: string
 
     constructor(browser: ProtractorBrowser) {
+        //Model
         this.modelDescription = "//textarea[@ng-model='description']"
         this.modelTitle = "//input[@ng-model='title']"
         this.modelAction = "//textarea[@ng-model='action']"
         this.resolve_btn = "//span[text()='Resolved']"
         this.model = "//div[contains(text(),'Add New Issue / Comment')]"
-
-        this.status_red = "//div[contains(@class,'color-item ng-scope bg-red')]"
-        this.status_green = "//div[contains(@class,'color-item ng-scope bg-green')]"
-        this.status_yellow = "//div[contains(@class,'color-item ng-scope bg-yellow')]"
-        this.frame_improve = "//div[text()='Improvements /Initiatives']//following-sibling::div[1]//div//div//div//div//iframe"
-        this.frame_projectHighlight = "//div[text()='Project Highlight']//following-sibling::div[1]//div//div//div//div//iframe"
-        this.frame_otherActivities = "//div[text()='Other Activities']//following-sibling::div[1]//div//div//div//div//iframe"
         this.addAndClose_btn = "//button[contains(text(),'Add & Close')]"
         this.addAndContrinue_btn = "//button[contains(text(),'Add & Continue')]"
         this.cancel_btn = "//button[contains(text(),'Cancel')]"
-        this.model = "//div[text()='Add New Issue / Comment']"
         this.addSuccess_msg = "//span[contains(text(),'Added the comment successfully')]"
+        //Status
+        this.status_red = "//div[contains(@class,'color-item ng-scope bg-red')]"
+        this.status_green = "//div[contains(@class,'color-item ng-scope bg-green')]"
+        this.status_yellow = "//div[contains(@class,'color-item ng-scope bg-yellow')]"
+        //Frame
+        this.frame_improve = "//div[text()='Improvements /Initiatives']//following-sibling::div[1]//div//div//div//div//iframe"
+        this.frame_projectHighlight = "//div[text()='Project Highlight']//following-sibling::div[1]//div//div//div//div//iframe"
+        this.frame_otherActivities = "//div[text()='Other Activities']//following-sibling::div[1]//div//div//div//div//iframe"
+        //Report submit        
         this.reportSubmit_msg = "//span[contains(text(),'Your report has been submitted!')]"
         this.reportSubmit_btn_Cur = "//div[text()='Project’s KPI']//following-sibling::div[4]//button[text()='Submit']"
         this.reportSubmit_btn_Prev = "//div[text()='Project’s KPI']//following-sibling::div[3]//button[text()='Submit']"
         this.reportResubmit_btn_Cur = "//div[text()='Project’s KPI']//following-sibling::div[4]//span[text()='Resubmit']"
         this.reportResubmit_btn_Prev = "//div[text()='Project’s KPI']//following-sibling::div[3]//span[text()='Resubmit']"
+        //Business opportunity
         this.addNewOpport_btn = "//button[text()='Add New Opportunity']"
         this.customerName = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//input[@ng-model='businessHighlight.CustomerName']"
         this.status = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//input[@ng-model='businessHighlight.Status']"
         this.requirement = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//textarea[@ng-model='businessHighlight.Requirement']"
         this.resourcedNeeded = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//input[@ng-model='businessHighlight.ResourcedNeeded']"
         this.possibilityPreparation = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//textarea[@ng-model='businessHighlight.PossibilityHighlightName']"
+        //
         this.startDate = "//input[@ng-model='dateWeekNumber.startDate']"
         this.endDate = "//input[@ng-model='dateWeekNumber.endDate']"
         this.apply = "//button[@ng-click='applyReport()']"
@@ -161,7 +165,7 @@ export class ReportPage {
         await browser.sleep(2000)
     }
 
-    async issueModel(title, description, action) {
+    async issueModel(title, description, action: string) {
         let actionSupport = new ActionSupport(browser)
         await actionSupport.sendKeysOnElement(this.modelTitle, title)
         await actionSupport.sendKeysOnElement(this.modelDescription, description)
@@ -210,7 +214,7 @@ export class ReportPage {
         await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ (count + 1) +"]//textarea[@ng-model='businessHighlight.PossibilityHighlightName']")).sendKeys(possibility)
     }
 
-    async deleteBusinessOpportunity_btn(row){
+    async deleteBusinessOpportunity(row){
         let deleted = browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ row + "]//button[@ng-click='deleteBusinessopportunity(highlight, businessHighlight)']")).click()
     }
 
@@ -219,14 +223,12 @@ export class ReportPage {
     }
 
     async deleteClickOK(){
-        
-        await browser.element(by.xpath(this.deleteOK_btn)).click()
-        await browser.sleep(2000)
         let rows = browser.element.all(by.repeater("businessHighlight in highlight.BusinessOpportunityHighlightDtos"))
-        let count = await rows.count()  
+        let count = await rows.count() 
+        await browser.element(by.xpath(this.deleteOK_btn)).click()
         let deleted = browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ count + "]//button[@ng-click='deleteBusinessopportunity(highlight, businessHighlight)']")) 
-        //await expect(deleted.isPresent()).toBe(false)
-        console.log(count)
+        await expect(deleted.isPresent()).toBe(false)
+
 
     }
 
