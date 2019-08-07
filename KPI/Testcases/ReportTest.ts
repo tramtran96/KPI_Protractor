@@ -12,12 +12,12 @@ describe("Report Page", function(){
         reportPage = new ReportPage(browser)
         await browser.manage().window().maximize()
         await browser.get("http://10.1.0.62/kpi/#/")
+        await loginPage.loginPage("tpphuoc", "1234")
+        await loginPage.loginSuccess()
     })
     it("Select week by start date ", async function(){
         let year = "2019"
         let week = "20"
-        await loginPage.loginPage("tttoai", "1234")
-        await loginPage.loginSuccess()
         await reportPage.selectStartDate(year, week)
         await reportPage.selectStartDateSuccess(week)
     })
@@ -25,8 +25,6 @@ describe("Report Page", function(){
     it("Select week by end date ", async function(){
         let year = "2019"
         let week = "20"
-        await loginPage.loginPage("tttoai", "1234")
-        await loginPage.loginSuccess()
         await reportPage.selectEndDate(year, week)
         await reportPage.selectEndDateSuccess(week)
     })
@@ -37,8 +35,6 @@ describe("Report Page", function(){
         let title = "New comment"
         let description = "Desciption"
         let action = "click"
-        await loginPage.loginPage("tttoai", "1234")
-        await loginPage.loginSuccess()
         console.log("STEP 1: Select status_yellow for Schedule and Add a new comment")
         await reportPage.selectStatus_btn(sche).prevval.click()
         await browser.sleep(2000)
@@ -91,8 +87,6 @@ describe("Report Page", function(){
             let sche = 'Schedule'
             let title = "New comment"
             let description = "Desciption"
-            await loginPage.loginPage("tttoai", "1234")
-            await loginPage.loginSuccess()
             console.log("STEP 1: Select status_yellow for Schedule and Add a new comment")
             await reportPage.selectStatus_btn(sche).curval.click()
             await browser.sleep(2000)
@@ -137,21 +131,46 @@ describe("Report Page", function(){
             await reportPage.reportSubmitCur()
         })
         it("Delete customer at 2nd row ", async function(){
-            await loginPage.loginPage("tttoai", "1234")
-            await loginPage.loginSuccess()
-            await reportPage.deleteBusinessOpportunity(4)
+            await reportPage.selectCurrentRole("Project")
+            debugger
+            await reportPage.deleteBusinessOpportunity(1)
+            debugger
             await browser.sleep(2000)
             await reportPage.deleteWarning()
+            debugger
             await reportPage.deleteClickOK()
             await browser.sleep(5000)
         })
 
+        it("Select current role", async function(){
+            await reportPage.selectCurrentRole("")
+            await browser.sleep(5000)
+            
+        })
+
         fit("Test some function", async function(){
-            await loginPage.loginPage("tttoai", "1234")
-            await loginPage.loginSuccess()
-            await reportPage.selectComment_btn("Quality").curval.click()
-            await reportPage.issueModel("dfdf", "dffd", "dffsfd")
-            await reportPage.addAndClose()
+            let n = 3
+            await reportPage.switchPrevWeek(n, new Date())
+            await reportPage.getLast4Weeks()
             await browser.sleep(5000)
         })
+
+        it("gdgdgdg", async function(){
+            let projectname = "CC-IC/OA"
+            await reportPage.selectCurrentRole("Project Head")
+            await reportPage.selectRoleSuccesss("Project")
+            await reportPage.selectProject(projectname)
+            let check = await reportPage.checkProjectName(projectname)
+            if (check == 1){
+                await reportPage.selectProject(projectname)
+                await browser.sleep(3000)
+                await reportPage.selectProjectSuccess(projectname)
+                await reportPage.selectStatus_btn("Quality").curval.click()
+                await browser.sleep(5000)
+            }
+            else
+            console.log("NOT FIND PROJECT NAME")
+            await reportPage.getLast4Weeks()
+        })
+
 })

@@ -35,7 +35,7 @@ export class ReportPage {
     reportResubmit_btn_Cur: string
     reportResubmit_btn_Prev: string
     reportSubmit_msg: string
-    //
+    //Start date and end day
     startDate: string
     endDate: string
     apply: string
@@ -51,6 +51,11 @@ export class ReportPage {
     userAccount_btn: string
     selectRole_btn: string
     projectHeadRole_btn: string
+    KPITableName_PMrole: string
+    //select week
+    last4Week_btn: string
+    switchLeft_btn: string
+    switchRight_btn: string
 
     constructor(browser: ProtractorBrowser) {
         //Model
@@ -68,15 +73,15 @@ export class ReportPage {
         this.status_green = "//div[contains(@class,'color-item ng-scope bg-green')]"
         this.status_yellow = "//div[contains(@class,'color-item ng-scope bg-yellow')]"
         //Frame
-        this.frame_improve = "//div[text()='Improvements /Initiatives']//following-sibling::div[1]//div//div//div//div//iframe"
-        this.frame_projectHighlight = "//div[text()='Project Highlight']//following-sibling::div[1]//div//div//div//div//iframe"
-        this.frame_otherActivities = "//div[text()='Other Activities']//following-sibling::div[1]//div//div//div//div//iframe"
+        this.frame_improve = "//div[text()='Improvements /Initiatives']//following-sibling::div[1]//iframe"
+        this.frame_projectHighlight = "//div[text()='Project Highlight']//following-sibling::div[1]//iframe"
+        this.frame_otherActivities = "//div[text()='Other Activities']//following-sibling::div[1]//iframe"
         //Report submit        
         this.reportSubmit_msg = "//span[contains(text(),'Your report has been submitted!')]"
-        this.reportSubmit_btn_Cur = "//div[text()='Project’s KPI']//following-sibling::div[4]//button[text()='Submit']"
-        this.reportSubmit_btn_Prev = "//div[text()='Project’s KPI']//following-sibling::div[3]//button[text()='Submit']"
-        this.reportResubmit_btn_Cur = "//div[text()='Project’s KPI']//following-sibling::div[4]//span[text()='Resubmit']"
-        this.reportResubmit_btn_Prev = "//div[text()='Project’s KPI']//following-sibling::div[3]//span[text()='Resubmit']"
+        this.reportSubmit_btn_Cur = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[@class='col-item col-kpi p-2']//following-sibling::div[4]//button[text()='Submit']"
+        this.reportSubmit_btn_Prev = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[@class='col-item col-kpi p-2']//following-sibling::div[3]//button[text()='Submit']"
+        this.reportResubmit_btn_Cur = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[@class='col-item col-kpi p-2']///following-sibling::div[4]//span[text()='Resubmit']"
+        this.reportResubmit_btn_Prev = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[@class='col-item col-kpi p-2']///following-sibling::div[3]//span[text()='Resubmit']"
         //Business opportunity
         this.addNewOpport_btn = "//button[text()='Add New Opportunity']"
         this.customerName = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//input[@ng-model='businessHighlight.CustomerName']"
@@ -84,7 +89,7 @@ export class ReportPage {
         this.requirement = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//textarea[@ng-model='businessHighlight.Requirement']"
         this.resourcedNeeded = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//input[@ng-model='businessHighlight.ResourcedNeeded']"
         this.possibilityPreparation = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//textarea[@ng-model='businessHighlight.PossibilityHighlightName']"
-        //
+        //Start date and end day
         this.startDate = "//input[@ng-model='dateWeekNumber.startDate']"
         this.endDate = "//input[@ng-model='dateWeekNumber.endDate']"
         this.apply = "//button[@ng-click='applyReport()']"
@@ -99,13 +104,17 @@ export class ReportPage {
         //Select current role
         this.userAccount_btn = "//span[@ng-click='clickToShowSelectRole()']"
         this.selectRole_btn = "//div[@class='select-option']"
-        this.projectHeadRole_btn = "//li[contains(text(),'Project Head')]"
+        this.KPITableName_PMrole = "//div[@class='col-item col-kpi p-2']"
+        //Select week
+        this.last4Week_btn = "//button[text()='Last 4 weeks']"
+        this.switchLeft_btn = "//i[@class='fa fa-angle-left']"
+        this.switchRight_btn = "//i[@class='fa fa-angle-right']"
     }
 
     selectStatus_btn(select) {
-        let cur = browser.element(by.xpath("//div[@class='row-item row-kpi d-flex justify-content-start align-items-center ng-scope']//div[text()='" + select + "']//following-sibling::div[4]//button[@ng-click='changeChooseKPIStatus(weekReport, kpi, $event)']"))
-        let prev = browser.element(by.xpath("//div[@class='row-item row-kpi d-flex justify-content-start align-items-center ng-scope']//div[text()='" + select + "']//following-sibling::div[3]//button[@ng-click='changeChooseKPIStatus(weekReport, kpi, $event)']"))
-        
+        let cur = browser.element(by.xpath("//div[text()='" + select + "']//following-sibling::div[4]//button[@ng-click='changeChooseKPIStatus(weekReport, kpi, $event)']"))
+        let prev = browser.element(by.xpath("//div[text()='" + select + "']//following-sibling::div[3]//button[@ng-click='changeChooseKPIStatus(weekReport, kpi, $event)']"))
+
         let obj = {
             curval: cur,
             prevval: prev
@@ -114,8 +123,8 @@ export class ReportPage {
     }
 
     selectComment_btn(select) {
-        let cur = browser.element(by.xpath("//div[@class='row-item row-kpi d-flex justify-content-start align-items-center ng-scope']//div[text()='" + select + "']//following-sibling::div[4]//button[@ng-click='addNewIssue(weekReport,kpi)']"))
-        let prev = browser.element(by.xpath("//div[@class='row-item row-kpi d-flex justify-content-start align-items-center ng-scope']//div[text()='" + select + "']//following-sibling::div[3]//button[@ng-click='addNewIssue(weekReport,kpi)']"))
+        let cur = browser.element(by.xpath("//div[text()='" + select + "']//following-sibling::div[4]//button[@ng-click='addNewIssue(weekReport,kpi)']"))
+        let prev = browser.element(by.xpath("//div[text()='" + select + "']//following-sibling::div[3]//button[@ng-click='addNewIssue(weekReport,kpi)']"))
         let obj = {
             curval: cur,
             prevval: prev
@@ -123,24 +132,29 @@ export class ReportPage {
         return obj;
     }
 
-    async addIssue()
-    { 
+    async addIssue() {
         let actionSupport = new ActionSupport(browser)
         await actionSupport.clickOnElement(this.addIssue_btn)
         await browser.sleep(2000)
     }
 
-    async addComment()
-    {
+    async addComment() {
         let actionSupport = new ActionSupport(browser)
         await actionSupport.clickOnElement(this.addComment_btn)
     }
 
-    async selectCurrentRole(){
+    async selectCurrentRole(role) {
         let actionSupport = new ActionSupport(browser)
+        let selectrole = "//li[contains(text(),'" + role + "')]"
         await actionSupport.clickOnElement(this.userAccount_btn)
         await actionSupport.clickOnElement(this.selectRole_btn)
-        await actionSupport.clickOnElement(this.projectHeadRole_btn)
+        await actionSupport.clickOnElement(selectrole)
+    }
+
+    async selectRoleSuccesss(tableName) {
+        let actionSupport = new ActionSupport(browser)
+        let name = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[contains(@class, 'col-item col-kpi p-2')]"
+        await expect(browser.element(by.xpath(name)).getText()).toContain(tableName)
     }
 
     async statusGreen() {
@@ -205,34 +219,34 @@ export class ReportPage {
     async businessOpportunity(customername, status, require, resource, possibility) {
         let actionSupport = new ActionSupport(browser)
         let rows = browser.element.all(by.repeater("businessHighlight in highlight.BusinessOpportunityHighlightDtos"))
-        let count = await rows.count()   
+        let count = await rows.count()
         await actionSupport.clickOnElement(this.addNewOpport_btn)
-        await actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ (count + 1) +"]//input[@ng-model='businessHighlight.CustomerName']", customername)
-        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ (count + 1) +"]//input[@ng-model='businessHighlight.Status']")).sendKeys(status)
-        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ (count + 1) +"]//textarea[@ng-model='businessHighlight.Requirement']")).sendKeys(require)
-        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ (count + 1) +"]//input[@ng-model='businessHighlight.ResourcedNeeded']")).sendKeys(resource)
-        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ (count + 1) +"]//textarea[@ng-model='businessHighlight.PossibilityHighlightName']")).sendKeys(possibility)
+        await actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.CustomerName']", customername)
+        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.Status']")).sendKeys(status)
+        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//textarea[@ng-model='businessHighlight.Requirement']")).sendKeys(require)
+        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.ResourcedNeeded']")).sendKeys(resource)
+        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//textarea[@ng-model='businessHighlight.PossibilityHighlightName']")).sendKeys(possibility)
     }
 
-    async deleteBusinessOpportunity(row){
-        let deleted = browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ row + "]//button[@ng-click='deleteBusinessopportunity(highlight, businessHighlight)']")).click()
+    async deleteBusinessOpportunity(row) {
+        let deleted = browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + row + "]//button[@ng-click='deleteBusinessopportunity(highlight, businessHighlight)']")).click()
     }
 
-    async deleteWarning(){
+    async deleteWarning() {
         await expect(browser.element(by.xpath(this.deleteCustomer_msg)).isDisplayed()).toBe(true)
     }
 
-    async deleteClickOK(){
+    async deleteClickOK() {
         let rows = browser.element.all(by.repeater("businessHighlight in highlight.BusinessOpportunityHighlightDtos"))
-        let count = await rows.count() 
+        let count = await rows.count()
         await browser.element(by.xpath(this.deleteOK_btn)).click()
-        let deleted = browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos']["+ count + "]//button[@ng-click='deleteBusinessopportunity(highlight, businessHighlight)']")) 
+        let deleted = browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + count + "]//button[@ng-click='deleteBusinessopportunity(highlight, businessHighlight)']"))
         await expect(deleted.isPresent()).toBe(false)
 
 
     }
 
-    async deleteClickCancel(){
+    async deleteClickCancel() {
         await browser.element(by.xpath(this.deleteCancel_btn)).click()
     }
 
@@ -298,7 +312,7 @@ export class ReportPage {
         await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 1000, message.locator())).toBe(true)
     }
 
-    async selectStartDate(year, week){
+    async selectStartDate(year, week) {
         await browser.element(by.xpath(this.startDate)).click()
         await browser.element(by.xpath(this.startDate)).sendKeys(year)
         await browser.element(by.xpath(this.startDate)).sendKeys(Key.ARROW_LEFT)
@@ -308,7 +322,7 @@ export class ReportPage {
         await browser.sleep(2000)
     }
 
-    async selectEndDate(year, week){
+    async selectEndDate(year, week) {
         await browser.element(by.xpath(this.endDate)).click()
         await browser.element(by.xpath(this.endDate)).sendKeys(year)
         await browser.element(by.xpath(this.endDate)).sendKeys(Key.ARROW_LEFT)
@@ -318,12 +332,59 @@ export class ReportPage {
         await browser.sleep(2000)
     }
 
-    async selectStartDateSuccess(week){
+    async selectStartDateSuccess(week) {
         let applyText = await browser.element(by.xpath(this.applyStartDateSuccess)).getText()
         await expect(applyText).toContain(week)
     }
-    async selectEndDateSuccess(week){
+    async selectEndDateSuccess(week) {
         let applyText = await browser.element(by.xpath(this.applyEndDateSuccess)).getText()
         await expect(applyText).toContain(week)
     }
+    
+    //Click n times on Previous Week button
+    async switchPrevWeek(n, d: Date) {
+        for (let i = n; i > 0; i--) {
+            await browser.element(by.xpath(this.switchLeft_btn)).click()
+        }
+        let successText = await browser.element(by.xpath(this.applyEndDateSuccess)).getText()
+        await expect(successText).toContain("" + (this.getCurrentWeek(new Date) - n) + "")
+    }
+
+    async getLast4Weeks(){
+        let actionSupport = new ActionSupport(browser)
+        await actionSupport.clickOnElement(this.last4Week_btn)
+        let successText = await actionSupport.getElementText(this.applyEndDateSuccess)
+        await expect(successText).toContain("" + this.getCurrentWeek(new Date) + "")
+    }
+    async selectProject(projectname) {
+        let projectName = "//li[@ng-repeat='unit in unitChartsStatus']//span[text()='" + projectname + "']"
+        await browser.element(by.xpath(projectName)).click()
+    }
+
+    async checkProjectName(projectname) {
+        let check = 0
+        let project = browser.element.all(by.xpath("//span[@class='nav-link ng-binding']"))
+        let projectText = await project.getText()
+        for (let i = 0; i < projectText.length; i++) {
+            if (projectname == projectText[i])
+                check += 1
+        }
+        return check
+    }
+
+    async selectProjectSuccess(projectname) {
+        let actionSupport = new ActionSupport(browser)
+        let successText = actionSupport.getElementText("//li[@class='nav-item tab-project-item uib-tab  active']//span")
+        console.log(successText)
+        await expect(successText).toEqual(projectname)
+    }
+
+    getCurrentWeek(d: Date) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        var curweek = Math.ceil((((d.valueOf() - yearStart.valueOf()) / 86400000) + 1) / 7);
+        return curweek
+    }
+
 }
