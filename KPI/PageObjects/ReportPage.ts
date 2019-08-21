@@ -1,20 +1,15 @@
-import { ProtractorBrowser, browser, by, ExpectedConditions, element, Key } from "protractor";
+import { ProtractorBrowser, browser, by, ExpectedConditions, Key } from "protractor";
 import { ActionSupport } from "../core_function/actionSupport/actionSupport";
-import { async } from "q";
 
 export class ReportPage {
+    actionSupport: ActionSupport
     //Status
-    status_red: string
-    status_green: string
-    status_yellow: string
+    redStatusXPath: string
+    greenStatusXPath: string
+    yellowStatusXPath: string
     //Business opportunity
     addNewOpport_btn: string
     deleteOpport_btn: string
-    customerName: string
-    status: string
-    requirement: string
-    resourcedNeeded: string
-    possibilityPreparation: string
     //Frame
     frame_improve: string
     frame_projectHighlight: string
@@ -30,15 +25,15 @@ export class ReportPage {
     addSuccess_msg: string
     resolve_btn: string
     //Report submit
-    reportSubmit_btn_Cur: string
-    reportSubmit_btn_Prev: string
-    reportResubmit_btn_Cur: string
-    reportResubmit_btn_Prev: string
+    submitCurBtnXPath: string
+    submitPreBtnXPath: string
+    resubmitCurBtnXPath: string
+    resubmitPreBtnXPath: string
     reportSubmit_msg: string
     //Start date and end day
-    startDate: string
-    endDate: string
-    apply: string
+    startWeekXPath: string
+    endWeekXPath: string
+    applyBtnXPath: string
     applyStartDateSuccess: string
     applyEndDateSuccess: string
     addIssue_btn: string
@@ -48,20 +43,29 @@ export class ReportPage {
     deleteOK_btn: string
     deleteCancel_btn: string
     //Select current role
-    userAccount_btn: string
+    dropDownProfile : string
     selectRole_btn: string
     projectHeadRole_btn: string
     KPITableName_PMrole: string
-    //select week
-    last4Week_btn: string
-    switchLeft_btn: string
-    switchRight_btn: string
+    //change week
+    lastFor4WeeksXPath: string
+    previousButtonXPath: string
+    nextButtonXPath: string
+    //View list Issue Comment Model
+    viewIssueCommentBtnXPath: string
+    viewModelMsgXPath: string
+    issueCommentModelXPath: string
+    programKPIXPath: string
+    closeBtnXPath: string
+    //Verify select project successfully
+    projectXPath: string
 
     constructor(browser: ProtractorBrowser) {
+        this.actionSupport = new ActionSupport(browser)
         //Model
-        this.modelDescription = "//textarea[@ng-model='description']"
+        this.modelDescription = "//textarea[contains(@ng-model,'description')]"
         this.modelTitle = "//input[@ng-model='title']"
-        this.modelAction = "//textarea[@ng-model='action']"
+        this.modelAction = "//textarea[contains(@ng-model,'action')]"
         this.resolve_btn = "//span[text()='Resolved']"
         this.model = "//div[contains(text(),'Add New Issue / Comment')]"
         this.addAndClose_btn = "//button[contains(text(),'Add & Close')]"
@@ -69,30 +73,25 @@ export class ReportPage {
         this.cancel_btn = "//button[contains(text(),'Cancel')]"
         this.addSuccess_msg = "//span[contains(text(),'Added the comment successfully')]"
         //Status
-        this.status_red = "//div[contains(@class,'color-item ng-scope bg-red')]"
-        this.status_green = "//div[contains(@class,'color-item ng-scope bg-green')]"
-        this.status_yellow = "//div[contains(@class,'color-item ng-scope bg-yellow')]"
+        this.redStatusXPath = "//div[contains(@class,'color-item ng-scope bg-red')]"
+        this.greenStatusXPath = "//div[contains(@class,'color-item ng-scope bg-green')]"
+        this.yellowStatusXPath = "//div[contains(@class,'color-item ng-scope bg-yellow')]"
         //Frame
         this.frame_improve = "//div[text()='Improvements /Initiatives']//following-sibling::div[1]//iframe"
         this.frame_projectHighlight = "//div[text()='Project Highlight']//following-sibling::div[1]//iframe"
         this.frame_otherActivities = "//div[text()='Other Activities']//following-sibling::div[1]//iframe"
         //Report submit        
         this.reportSubmit_msg = "//span[contains(text(),'Your report has been submitted!')]"
-        this.reportSubmit_btn_Cur = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[@class='col-item col-kpi p-2']//following-sibling::div[4]//button[text()='Submit']"
-        this.reportSubmit_btn_Prev = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[@class='col-item col-kpi p-2']//following-sibling::div[3]//button[text()='Submit']"
-        this.reportResubmit_btn_Cur = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[@class='col-item col-kpi p-2']///following-sibling::div[4]//span[text()='Resubmit']"
-        this.reportResubmit_btn_Prev = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[@class='col-item col-kpi p-2']///following-sibling::div[3]//span[text()='Resubmit']"
+        this.submitCurBtnXPath = "//div[contains(@class,'col-item col-kpi p-2')]//following-sibling::div[4]//button[text()='Submit']"
+        this.submitPreBtnXPath = "//div[contains(@class,'col-item col-kpi p-2')]//following-sibling::div[3]//button[text()='Submit']"
+        this.resubmitCurBtnXPath = "//div[contains(@class,'col-item col-kpi p-2')]//following-sibling::div[4]//button[text()='Resubmit']"
+        this.resubmitPreBtnXPath = "//div[contains(@class,'col-item col-kpi p-2')]//following-sibling::div[3]//button[text()='Resubmit']"
         //Business opportunity
         this.addNewOpport_btn = "//button[text()='Add New Opportunity']"
-        this.customerName = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//input[@ng-model='businessHighlight.CustomerName']"
-        this.status = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//input[@ng-model='businessHighlight.Status']"
-        this.requirement = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//textarea[@ng-model='businessHighlight.Requirement']"
-        this.resourcedNeeded = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//input[@ng-model='businessHighlight.ResourcedNeeded']"
-        this.possibilityPreparation = "//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][2]//textarea[@ng-model='businessHighlight.PossibilityHighlightName']"
         //Start date and end day
-        this.startDate = "//input[@ng-model='dateWeekNumber.startDate']"
-        this.endDate = "//input[@ng-model='dateWeekNumber.endDate']"
-        this.apply = "//button[@ng-click='applyReport()']"
+        this.startWeekXPath = "//input[@ng-model='dateWeekNumber.startDate']"
+        this.endWeekXPath = "//input[@ng-model='dateWeekNumber.endDate']"
+        this.applyBtnXPath = "//button[@ng-click='applyReport()']"
         this.applyStartDateSuccess = "//div[@ng-repeat='week in weeksInYearIsChoose'][1]//div[1]//div[1]"
         this.applyEndDateSuccess = "//div[@ng-repeat='week in weeksInYearIsChoose'][4]//div[1]//div[1]"
         this.addIssue_btn = "//label[@for='type-issue']"
@@ -102,130 +101,128 @@ export class ReportPage {
         this.deleteOK_btn = "//button[@data-ng-click='modalOptions.ok();']"
         this.deleteCancel_btn = "//button[@data-ng-click='modalOptions.close()']"
         //Select current role
-        this.userAccount_btn = "//span[@ng-click='clickToShowSelectRole()']"
+        this.dropDownProfile  = "//span[@ng-click='clickToShowSelectRole()']"
         this.selectRole_btn = "//div[@class='select-option']"
         this.KPITableName_PMrole = "//div[@class='col-item col-kpi p-2']"
-        //Select week
-        this.last4Week_btn = "//button[text()='Last 4 weeks']"
-        this.switchLeft_btn = "//i[@class='fa fa-angle-left']"
-        this.switchRight_btn = "//i[@class='fa fa-angle-right']"
+        //Change week
+        this.previousButtonXPath = "//span[@ng-click='descreaseWeek()']"
+        this.nextButtonXPath = "//span[@ng-click='increaseWeek()']"
+        this.lastFor4WeeksXPath = "//button[@ng-click='applyLastFourWeek()']"
+        // View list Issue Comment Model
+        this.viewIssueCommentBtnXPath = "//div[text()='Schedule']//following-sibling::div[5]//div[@ng-click='listIssueCommentModal(weekReport)']"
+        this.viewModelMsgXPath = "//div[text()='VitalSuite Issue/Comment']"
+        this.issueCommentModelXPath = "//div[@class='item py-3 px-4 ng-scope']"
+        this.programKPIXPath = "//select[@ng-model='kpiNameOfListIssue']"
+        this.closeBtnXPath = "//button[text()='Close']"
+        //Verify select project successfully
+        this.projectXPath = "//span[@class='nav-link ng-binding']"
     }
 
-    selectStatus_btn(select) {
-        let cur = browser.element(by.xpath("//div[text()='" + select + "']//following-sibling::div[4]//button[@ng-click='changeChooseKPIStatus(weekReport, kpi, $event)']"))
-        let prev = browser.element(by.xpath("//div[text()='" + select + "']//following-sibling::div[3]//button[@ng-click='changeChooseKPIStatus(weekReport, kpi, $event)']"))
-
-        let obj = {
-            curval: cur,
-            prevval: prev
-        }
-        return obj;
+    selectStatus(KPIname, week) {
+        let status = this.actionSupport.clickOnElement("//div[text()='" + KPIname + "']//following-sibling::div["+ week +"]//button[@ng-click='changeChooseKPIStatus(weekReport, kpi, $event)']")
     }
 
-    selectComment_btn(select) {
-        let cur = browser.element(by.xpath("//div[text()='" + select + "']//following-sibling::div[4]//button[@ng-click='addNewIssue(weekReport,kpi)']"))
-        let prev = browser.element(by.xpath("//div[text()='" + select + "']//following-sibling::div[3]//button[@ng-click='addNewIssue(weekReport,kpi)']"))
-        let obj = {
-            curval: cur,
-            prevval: prev
-        }
-        return obj;
+    selectComment(KPIname, week) {
+        let comment = this.actionSupport.clickOnElement("//div[text()='" + KPIname + "']//following-sibling::div["+ week +"]//button[@ng-click='addNewIssue(weekReport,kpi)']")
     }
 
     async addIssue() {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.addIssue_btn)
+        await this.actionSupport.clickOnElement(this.addIssue_btn)
         await browser.sleep(2000)
     }
 
     async addComment() {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.addComment_btn)
+        await this.actionSupport.clickOnElement(this.addComment_btn)
     }
 
     async selectCurrentRole(role) {
-        let actionSupport = new ActionSupport(browser)
         let selectrole = "//li[contains(text(),'" + role + "')]"
-        await actionSupport.clickOnElement(this.userAccount_btn)
-        await actionSupport.clickOnElement(this.selectRole_btn)
-        await actionSupport.clickOnElement(selectrole)
+        await this.actionSupport.clickOnElement(this.dropDownProfile)
+        await this.actionSupport.clickOnElement(this.selectRole_btn)
+        await this.actionSupport.clickOnElement(selectrole)
+    }
+    async selectProgramRoleSuccess(role: string){
+        let successText = await this.actionSupport.getElementText("//div[@class='name-report d-block w-100 ng-binding']")
+        let success_msg = role.substr(0,role.length - 5)
+        await expect("Program "+ success_msg +"").toEqual(successText)
     }
 
     async selectRoleSuccesss(tableName) {
-        let actionSupport = new ActionSupport(browser)
         let name = "//div[@class='row-item row-header d-flex justify-content-start align-items-start']//div[contains(@class, 'col-item col-kpi p-2')]"
-        await expect(browser.element(by.xpath(name)).getText()).toContain(tableName)
+        await expect(this.actionSupport.getElementText(name)).toContain(tableName)
+    }
+
+    async selectProgram(programname){
+        let programName = "//li[text() [contains(.,'"+ programname +"')]]"
+        let option_btn = "//div[@class='selected-option']//span[@class='ng-binding']"
+        await this.actionSupport.clickOnElement(option_btn)
+        await this.actionSupport.clickOnElement(programName)
+        await expect(this.actionSupport.getElementText(option_btn)).toEqual(programname)
     }
 
     async statusGreen() {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.status_green)
+        await this.actionSupport.clickOnElement(this.greenStatusXPath)
     }
 
     async statusRed() {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.status_red)
+        await this.actionSupport.clickOnElement(this.redStatusXPath)
     }
 
     async statusYellow() {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.status_yellow)
+        await this.actionSupport.clickOnElement(this.yellowStatusXPath)
     }
 
     async commentModel(title, description) {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.sendKeysOnElement(this.modelTitle, title)
-        await actionSupport.sendKeysOnElement(this.modelDescription, description)
-        await browser.sleep(2000)
+        await this.actionSupport.sendKeysOnElement(this.modelTitle, title)
+        await this.actionSupport.sendKeysOnElement(this.modelDescription, description)
     }
 
     async issueModel(title, description, action: string) {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.sendKeysOnElement(this.modelTitle, title)
-        await actionSupport.sendKeysOnElement(this.modelDescription, description)
-        await actionSupport.sendKeysOnElement(this.modelAction, action)
-        await browser.sleep(2000)
+        await this.actionSupport.sendKeysOnElement(this.modelTitle, title)
+        await this.actionSupport.sendKeysOnElement(this.modelDescription, description)
+        await this.actionSupport.sendKeysOnElement(this.modelAction, action)
     }
 
     async clickResolvedIssue() {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.resolve_btn)
+        await this.actionSupport.clickOnElement(this.resolve_btn)
     }
 
     async addAndClose() {
-        let actionSupport = new ActionSupport(browser)
         let message = await browser.element(by.xpath(this.addSuccess_msg))
-        await actionSupport.clickOnElement(this.addAndClose_btn)
+        await this.actionSupport.clickOnElement(this.addAndClose_btn)
         await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 10000, message.locator())).toBe(true)
         await expect(browser.element(by.xpath(this.model)).isPresent()).toBe(false)
     }
 
     async addAndContinue() {
-        let actionSupport = new ActionSupport(browser)
         let message = await browser.element(by.xpath(this.addSuccess_msg))
-        await actionSupport.clickOnElement(this.addAndContrinue_btn)
-        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 1000, message.locator())).toBe(true)
+        await this.actionSupport.clickOnElement(this.addAndContrinue_btn)
+        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 10000, message.locator())).toBe(true)
         await expect(browser.element(by.xpath(this.model)).isPresent()).toBe(true)
-        await browser.sleep(5000)
     }
 
     async cancel() {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.cancel_btn)
+        await this.actionSupport.clickOnElement(this.cancel_btn)
         await expect(browser.element(by.xpath(this.model)).isPresent()).toBe(false)
         await browser.sleep(5000)
     }
 
-    async businessOpportunity(customername, status, require, resource, possibility) {
-        let actionSupport = new ActionSupport(browser)
+    async businessOpportunity(customername, project, status, require, domain, resource, startdate, possibility) {
         let rows = browser.element.all(by.repeater("businessHighlight in highlight.BusinessOpportunityHighlightDtos"))
         let count = await rows.count()
-        await actionSupport.clickOnElement(this.addNewOpport_btn)
-        await actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.CustomerName']", customername)
-        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.Status']")).sendKeys(status)
-        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//textarea[@ng-model='businessHighlight.Requirement']")).sendKeys(require)
-        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.ResourcedNeeded']")).sendKeys(resource)
-        await browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//textarea[@ng-model='businessHighlight.PossibilityHighlightName']")).sendKeys(possibility)
+        await this.actionSupport.clickOnElement(this.addNewOpport_btn)
+        await expect(this.actionSupport.getElementAttribute(this.addNewOpport_btn, "class")).toEqual("btn-disable")
+        await this.actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.CustomerName']", customername)
+        await this.actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//select[@ng-model='businessHighlight.UnitChartName']", project)
+        await this.actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.Status']", status)
+        await this.actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//textarea[@ng-model='businessHighlight.Requirement']", require)
+        await expect(this.actionSupport.getElementAttribute(this.addNewOpport_btn, "class")).toEqual("")
+        await this.actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.Domain']", domain)
+        await this.actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.ResourcedNeeded']", resource)
+        await this.actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.TentativeStartDate']", startdate)
+        await this.actionSupport.sendKeysOnElement("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//textarea[@ng-model='businessHighlight.PossibilityHighlightName']", possibility)
+        let a = await this.actionSupport.getElementText("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + (count + 1) + "]//input[@ng-model='businessHighlight.CustomerName']")
+        console.log(a)
     }
 
     async deleteBusinessOpportunity(row) {
@@ -239,7 +236,7 @@ export class ReportPage {
     async deleteClickOK() {
         let rows = browser.element.all(by.repeater("businessHighlight in highlight.BusinessOpportunityHighlightDtos"))
         let count = await rows.count()
-        await browser.element(by.xpath(this.deleteOK_btn)).click()
+        await this.actionSupport.clickOnElement(this.deleteOK_btn)
         let deleted = browser.element(by.xpath("//div[@ng-repeat='businessHighlight in highlight.BusinessOpportunityHighlightDtos'][" + count + "]//button[@ng-click='deleteBusinessopportunity(highlight, businessHighlight)']"))
         await expect(deleted.isPresent()).toBe(false)
 
@@ -247,123 +244,96 @@ export class ReportPage {
     }
 
     async deleteClickCancel() {
-        await browser.element(by.xpath(this.deleteCancel_btn)).click()
+        await this.actionSupport.clickOnElement(this.deleteCancel_btn)
     }
 
     async improveComment(text) {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.frame_improve)
+        await this.actionSupport.clickOnElement(this.frame_improve)
         await browser.switchTo().frame(browser.element(by.xpath(this.frame_improve)).getWebElement())
         await browser.waitForAngularEnabled(false)
         await browser.element(by.tagName('body')).sendKeys(text)
+        await expect(browser.element(by.tagName('body')).getText()).toEqual(text)
         await browser.switchTo().defaultContent()
-        await browser.sleep(2000)
     }
 
     async projectHighlightComment(text) {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.frame_projectHighlight)
+        await this.actionSupport.clickOnElement(this.frame_projectHighlight)
         await browser.switchTo().frame(browser.element(by.xpath(this.frame_projectHighlight)).getWebElement())
         await browser.waitForAngularEnabled(false)
         await browser.element(by.tagName('body')).sendKeys(text)
+        await expect(browser.element(by.tagName('body')).getText()).toEqual(text)
         await browser.switchTo().defaultContent()
-        await browser.sleep(2000)
     }
 
     async otherActivitiesComment(text) {
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.frame_otherActivities)
+        await this.actionSupport.clickOnElement(this.frame_otherActivities)
         await browser.switchTo().frame(browser.element(by.xpath(this.frame_otherActivities)).getWebElement())
         await browser.waitForAngularEnabled(false)
         await browser.element(by.tagName('body')).sendKeys(text)
+        await expect(browser.element(by.tagName('body')).getText()).toEqual(text)
         await browser.switchTo().defaultContent()
-        await browser.sleep(2000)
     }
 
     async reportSubmitCur() {
-        let actionSupport = new ActionSupport(browser)
         let message = await browser.element(by.xpath(this.reportSubmit_msg))
-        await actionSupport.clickOnElement(this.reportSubmit_btn_Cur)
-        await browser.sleep(2000)
-        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 1000, message.locator())).toBe(true)
+        await this.actionSupport.clickOnElement(this.submitCurBtnXPath)
+        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 10000, message.locator())).toBe(true)
     }
 
     async reportSubmitPrev() {
-        let actionSupport = new ActionSupport(browser)
         let message = await browser.element(by.xpath(this.reportSubmit_msg))
-        await actionSupport.clickOnElement(this.reportSubmit_btn_Prev)
-        await browser.sleep(2000)
-        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 1000, message.locator())).toBe(true)
+        await this.actionSupport.clickOnElement(this.submitPreBtnXPath)
+        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 10000, message.locator())).toBe(true)
     }
 
     async reportResubmitCur() {
-        let actionSupport = new ActionSupport(browser)
         let message = await browser.element(by.xpath(this.reportSubmit_msg))
-        await actionSupport.clickOnElement(this.reportResubmit_btn_Cur)
-        await browser.sleep(2000)
-        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 1000, message.locator())).toBe(true)
+        await this.actionSupport.clickOnElement(this.resubmitCurBtnXPath)
+        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 10000, message.locator())).toBe(true)
     }
 
     async reportResubmitPrev() {
-        let actionSupport = new ActionSupport(browser)
         let message = await browser.element(by.xpath(this.reportSubmit_msg))
-        await actionSupport.clickOnElement(this.reportResubmit_btn_Prev)
-        await browser.sleep(2000)
-        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 1000, message.locator())).toBe(true)
+        await this.actionSupport.clickOnElement(this.resubmitPreBtnXPath)
+        await expect(browser.wait(ExpectedConditions.invisibilityOf(message), 10000, message.locator())).toBe(true)
     }
 
     async selectStartDate(year, week) {
-        await browser.element(by.xpath(this.startDate)).click()
-        await browser.element(by.xpath(this.startDate)).sendKeys(year)
-        await browser.element(by.xpath(this.startDate)).sendKeys(Key.ARROW_LEFT)
+        await this.actionSupport.clickOnElement(this.startWeekXPath)
+        await this.actionSupport.sendKeysOnElement(this.startWeekXPath, year)
+        await browser.element(by.xpath(this.startWeekXPath)).sendKeys(Key.ARROW_LEFT)
         await browser.sleep(2000)
-        await browser.element(by.xpath(this.startDate)).sendKeys(week)
-        await browser.element(by.xpath(this.apply)).click()
-        await browser.sleep(2000)
+        await this.actionSupport.sendKeysOnElement(this.startWeekXPath, week)
+        await this.actionSupport.clickOnElement(this.applyBtnXPath)
     }
 
     async selectEndDate(year, week) {
-        await browser.element(by.xpath(this.endDate)).click()
-        await browser.element(by.xpath(this.endDate)).sendKeys(year)
-        await browser.element(by.xpath(this.endDate)).sendKeys(Key.ARROW_LEFT)
+        await this.actionSupport.clickOnElement(this.endWeekXPath)
+        await this.actionSupport.sendKeysOnElement(this.endWeekXPath, year)
+        await browser.element(by.xpath(this.endWeekXPath)).sendKeys(Key.ARROW_LEFT)
         await browser.sleep(2000)
-        await browser.element(by.xpath(this.endDate)).sendKeys(week)
-        await browser.element(by.xpath(this.apply)).click()
-        await browser.sleep(2000)
+        await this.actionSupport.sendKeysOnElement(this.endWeekXPath, week)
+        await browser.element(by.xpath(this.applyBtnXPath)).click()
     }
 
     async selectStartDateSuccess(week) {
-        let applyText = await browser.element(by.xpath(this.applyStartDateSuccess)).getText()
+        let applyText = await this.actionSupport.getElementText(this.applyStartDateSuccess)
         await expect(applyText).toContain(week)
     }
+
     async selectEndDateSuccess(week) {
-        let applyText = await browser.element(by.xpath(this.applyEndDateSuccess)).getText()
+        let applyText = await this.actionSupport.getElementText(this.applyEndDateSuccess)
         await expect(applyText).toContain(week)
     }
     
-    //Click n times on Previous Week button
-    async switchPrevWeek(n, d: Date) {
-        for (let i = n; i > 0; i--) {
-            await browser.element(by.xpath(this.switchLeft_btn)).click()
-        }
-        let successText = await browser.element(by.xpath(this.applyEndDateSuccess)).getText()
-        await expect(successText).toContain("" + (this.getCurrentWeek(new Date) - n) + "")
-    }
-
-    async getLast4Weeks(){
-        let actionSupport = new ActionSupport(browser)
-        await actionSupport.clickOnElement(this.last4Week_btn)
-        let successText = await actionSupport.getElementText(this.applyEndDateSuccess)
-        await expect(successText).toContain("" + this.getCurrentWeek(new Date) + "")
-    }
     async selectProject(projectname) {
         let projectName = "//li[@ng-repeat='unit in unitChartsStatus']//span[text()='" + projectname + "']"
-        await browser.element(by.xpath(projectName)).click()
+        await this.actionSupport.clickOnElement(projectName)
     }
 
     async checkProjectName(projectname) {
         let check = 0
-        let project = browser.element.all(by.xpath("//span[@class='nav-link ng-binding']"))
+        let project = browser.element.all(by.xpath(this.projectXPath))//"//span[@class='nav-link ng-binding']"
         let projectText = await project.getText()
         for (let i = 0; i < projectText.length; i++) {
             if (projectname == projectText[i])
@@ -372,10 +342,25 @@ export class ReportPage {
         return check
     }
 
+    async addIssueOrComment(){
+        let addIssueOrComment_btn = "//label[@for='type-issue-project']"
+        await this.actionSupport.clickOnElement(addIssueOrComment_btn)
+    }
+
+    async addBusinessOpport(){
+        let addBusinessOpport_btn = "//button[text()='Add From Business Opportunity Table']"
+        await this.actionSupport.clickOnElement(addBusinessOpport_btn)
+    }
+
+    async selectProjectReport(projectname){
+        let projectName = "//li//*[text()='"+ projectname +"']"
+        await this.actionSupport.clickOnElement(projectName)
+        let verifyText = await this.actionSupport.getElementText("//li[@class='tab-project-item uib-tab nav-item ng-isolate-scope active']")
+        await expect(verifyText).toEqual(projectname)
+    }
+
     async selectProjectSuccess(projectname) {
-        let actionSupport = new ActionSupport(browser)
-        let successText = actionSupport.getElementText("//li[@class='nav-item tab-project-item uib-tab  active']//span")
-        console.log(successText)
+        let successText = this.actionSupport.getElementText("//li[@class='nav-item tab-project-item uib-tab  active']//span")
         await expect(successText).toEqual(projectname)
     }
 
@@ -385,6 +370,70 @@ export class ReportPage {
         var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
         var curweek = Math.ceil((((d.valueOf() - yearStart.valueOf()) / 86400000) + 1) / 7);
         return curweek
+    }
+
+    //Click n times on Previous Week button
+    async switchPrevWeek(n) {
+        for (let i = n; i > 0; i--) {
+            await this.actionSupport.clickOnElement(this.previousButtonXPath)
+        }
+        let successText = await this.actionSupport.getElementText(this.applyEndDateSuccess)
+        await expect(successText).toContain("" + (this.getCurrentWeek(new Date) - n) + "")
+    }
+
+    async getLast4Weeks(){
+        await this.actionSupport.clickOnElement(this.lastFor4WeeksXPath)
+        let successText = await this.actionSupport.getElementText(this.applyEndDateSuccess)
+        await expect(successText).toContain("" + this.getCurrentWeek(new Date) + "")
+    }
+
+    async switchNextWeek(n: number) {
+        let curWeek = this.getCurrentWeek(new Date)
+        const constEndWeek = Number(String(await this.actionSupport.getElementText(this.applyEndDateSuccess)).slice(5,7))
+        let endWeek = Number(String(await this.actionSupport.getElementText(this.applyEndDateSuccess)).slice(5,7))
+        let limitN = curWeek - endWeek
+        if (limitN == 0) {
+            console.log("ERROR: CAN NOT CLICK NEXT BUTTON WHEN STANDING CURRENT WEEK")
+            await expect(this.actionSupport.getElementAttribute(this.nextButtonXPath, "class")).toEqual("week-next has-event no-event")
+        }
+        else {
+            await expect(this.actionSupport.getElementAttribute(this.nextButtonXPath, "class")).toEqual("week-next has-event")
+            if (n <= limitN) {
+                for (let i = endWeek; i < (constEndWeek + n); i++) {
+                    await this.actionSupport.clickOnElement(this.nextButtonXPath)
+                }
+                let successText = await this.actionSupport.getElementText(this.applyEndDateSuccess)
+                await expect(successText).toContain("" + (constEndWeek + n) + "")
+            }
+            else
+            return console.log("ERROR: CAN NOT DISPLAY WEEK > CURRENT WEEK")
+        }
+    }
+
+    async ViewIssueCommentModel(){
+        await this.actionSupport.clickOnElement(this.viewIssueCommentBtnXPath)
+        await expect(browser.element(by.xpath(this.viewModelMsgXPath)).isDisplayed()).toBe(true)
+        await this.actionSupport.sendKeysOnElement(this.programKPIXPath, "Effort")
+        await this.actionSupport.sendKeysOnElement(this.programKPIXPath, "Schedule")   
+    }
+
+    async countIssueComnent(){
+        let listIssueComment = browser.element.all(by.xpath(this.issueCommentModelXPath))
+        let count = await listIssueComment.count()
+        return count
+    }
+
+    async closeViewIssueModel(){
+        await this.actionSupport.clickOnElement(this.closeBtnXPath)
+    }
+
+    async checkIssueComment(){
+        let number = await Number(this.countIssueComnent())
+        console.log(number)
+        if(number == 0){
+            await expect(browser.element(by.xpath(this.viewIssueCommentBtnXPath)).isDisplayed()).toBe(false)
+        }
+        await expect(browser.element(by.xpath(this.viewIssueCommentBtnXPath)).isDisplayed()).toBe(true)
     }
 
 }
