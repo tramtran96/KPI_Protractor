@@ -1,17 +1,22 @@
 import { LoginPage } from "../PageObjects/LoginPage";
 import { ReportPage } from "../PageObjects/ReportPage";
 import { browser} from "protractor";
-
+import {dataBuilder} from "../core_function/dataBuilder";
 describe("ProgramRole_ReportPage", function(){
     let loginPage: LoginPage
     let reportPage: ReportPage
+    let dataArray:Array<Map<string,string>>
 
     beforeEach(async function(){
         loginPage = new LoginPage(browser)
         reportPage = new ReportPage(browser)
         await browser.manage().window().maximize()
         await browser.get("http://10.1.0.62/kpi/#/")
-        await loginPage.loginPage("ncqphong", "1234")
+        dataArray = await dataBuilder.readExcel(__dirname + "\\..\\TestData\\Login.xlsx", "Login", "TC01")
+        let email=dataArray[0].get("Email")
+        let password=dataArray[0].get("Password")
+        console.log("STEP 1: login with blank username and password")
+        await loginPage.loginPage(email, password)
         await loginPage.loginSuccess()
     })
     it("Select Program Role ", async function () {
@@ -375,6 +380,30 @@ describe("ProgramRole_ReportPage", function(){
         console.log("STEP 6: Click Cancel to cancel command")
         await reportPage.IssueCommentModelClickCancel()
         await reportPage.DeleteIssueCommentInModel(1)
+    })
+    it("Edit Issue or Comment from Model", async function(){
+        console.log("STEP 1: Add and continue new issue 1")
+        await reportPage.SelectComment("Schedule", 4)
+        await reportPage.AddIssue()
+        await reportPage.IssueModel("new issue 1", "description", "action")
+        await reportPage.AddAndContinue("Added the issue successfully")
+        console.log("STEP 2: Add and continue new issue 2")
+        await reportPage.AddIssue()
+        await reportPage.IssueModel("new issue 2", "description", "action")
+        await reportPage.AddAndContinue("Added the issue successfully")
+        console.log("STEP 3: Add and continue new comment 1")
+        await reportPage.AddComment()
+        await reportPage.CommentModel("new comment 1", "description")
+        await reportPage.AddAndContinue("Added the comment successfully")
+        console.log("STEP 3: Add and close new comment 2")
+        await reportPage.AddComment()
+        await reportPage.CommentModel("new comment 2", "description")
+        await reportPage.AddAndClose("Added the comment successfully")
+        console.log("STEP 4: View Issue or Comment Model of Schedule")
+        await reportPage.ViewIssueCommentModel("Schedule")
+        console.log("STEP 5: Edit 1st issue or comment from Model")
+        await reportPage.EditIssueCommentInModel(1, "tttt", "dhdhd", "hdhdhd")
+        await browser.sleep(5000)
     })
     it("Submit report of previous week", async function(){
         console.log("STEP 1: Add and close new comment for Schedule")

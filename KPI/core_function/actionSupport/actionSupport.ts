@@ -1,4 +1,4 @@
-import {by, protractor, ProtractorBrowser, ProtractorExpectedConditions, ElementFinder} from 'protractor'
+import {by, protractor, ProtractorBrowser, ProtractorExpectedConditions, ElementFinder, browser, ElementArrayFinder} from 'protractor'
 
 export class ActionSupport{
     curBrowser:ProtractorBrowser
@@ -54,13 +54,18 @@ export class ActionSupport{
             textValue = value
         })
         return await ele.getText()
+        //return textValue
     }
 
     async isElementDisplayed(xpath:string):Promise<boolean>{
         var ele:ElementFinder = await this.curBrowser.element(by.xpath(xpath))
         await this.curBrowser.wait(this.until.presenceOf(ele), this.timeOut, 'Element ' + xpath + ' takes too long to appear in the DOM' )
         return await ele.isDisplayed()
-    }
+    } 
 
-    
+    async getAllTextInArray(xpath:string, text:string):Promise<string>{
+        var ele = browser.element.all(by.xpath(xpath))
+        var eleText = await ele.getText()
+        return eleText
+    }
 }

@@ -59,6 +59,8 @@ export class ReportPage {
     programKPIXPath: string
     closeBtnXPath: string
     numberOfIssueOrComment: string
+    saveEditBtnXPath: string
+    cancelEditBtnXPath: string
     //Verify select project successfully
     projectXPath: string
 
@@ -119,6 +121,8 @@ export class ReportPage {
         this.issueCommentModelXPath = "//div[@class='item py-3 px-4 ng-scope']"
         this.programKPIXPath = "//select[@ng-model='kpiNameOfListIssue']"
         this.closeBtnXPath = "//button[text()='Close']"
+        this.saveEditBtnXPath = "//button[@ng-click='saveIssueOrComment(title,description,actionEdit,resolve)']"
+        this.cancelEditBtnXPath = "//button[@ng-click='close(addIssueOrCommentPMReport)']"
         //Verify select project successfully
         this.projectXPath = "//span[@class='nav-link ng-binding']"
     }
@@ -549,18 +553,57 @@ export class ReportPage {
             console.log("Delete button is disable")
     }
 
-    async EditIssueCommentInModel(n) {
-        let editBtn = "//div[@class='item py-3 px-4 ng-scope']["+ n +"]//div[@ng-click='editIssue(issue)']"
+    async EditIssueInModel(title, description, action) {
+
+        await this.actionSupport.sendKeysOnElement(this.modelTitleXPath, title)
+        await this.actionSupport.sendKeysOnElement(this.modelDescriptionXPath, description)
+        await this.actionSupport.sendKeysOnElement(this.modelActionXPath, action)
+        await this.actionSupport.clickOnElement(this.saveEditBtnXPath)
+        await expect(this.actionSupport.getElementText(this.addSuccessMsgXPath)).toEqual("Edited the issue successfully")
+        let el = await browser.element(by.xpath(this.addSuccessMsgXPath))
+        await browser.wait(ExpectedConditions.not(ExpectedConditions.presenceOf(el)))
+        console.log("Edit issue successfully")
+
+    }
+
+    async EditCommentInModel(title, description) {
+        await this.actionSupport.sendKeysOnElement(this.modelTitleXPath, title)
+        await this.actionSupport.sendKeysOnElement(this.modelDescriptionXPath, description)
+        await this.actionSupport.clickOnElement(this.saveEditBtnXPath)
+        await expect(this.actionSupport.getElementText(this.addSuccessMsgXPath)).toEqual("Edited the comment successfully")
+        let el = await browser.element(by.xpath(this.addSuccessMsgXPath))
+        await browser.wait(ExpectedConditions.not(ExpectedConditions.presenceOf(el)))
+        console.log("Edit comment successfully")
+    }
+
+    async EditIssueCommentInModel(n, title, description, action) {
+        let editBtn = "//div[@class='item py-3 px-4 ng-scope'][" + n + "]//div[@ng-click='editIssue(issue)']"
         let count = await this.CheckDisableEditDeleteBtn(n)
+        let desc = await this.actionSupport.getElementText("//div[@class='item py-3 px-4 ng-scope'][" + n + "]//div[@class='item-type mt-2 ng-scope']")
         if (count == 0) {
-            let confirmmodel = await browser.element(by.xpath("//div[@class='modal-name ng-binding']"))
             await this.actionSupport.clickOnElement(editBtn)
-            await expect(confirmmodel.isDisplayed()).toBe(true)
+            console.log(desc)
+            if (desc == "Comment") {
+                await this.actionSupport.sendKeysOnElement(this.modelTitleXPath, title)
+                await this.actionSupport.sendKeysOnElement(this.modelDescriptionXPath, description)
+                await this.actionSupport.clickOnElement(this.saveEditBtnXPath)
+                await expect(this.actionSupport.getElementText(this.addSuccessMsgXPath)).toEqual("Edited the comment successfully")
+            }
+            if (desc == "Issue") {
+                console.log("1")
+                await this.actionSupport.sendKeysOnElement(this.modelTitleXPath, title)
+                console.log("2")
+                await this.actionSupport.sendKeysOnElement(this.modelDescriptionXPath, description)
+                await this.actionSupport.sendKeysOnElement(this.modelActionXPath, action)
+                await this.actionSupport.clickOnElement(this.saveEditBtnXPath)
+                await expect(this.actionSupport.getElementText(this.addSuccessMsgXPath)).toEqual("Edited the issue successfully")
+            }
+            console.log("Edit comment successfully")
         }
         else
             console.log("Edit button is disable")
     }
-    
+
     async IssueCommentModelClickOK(n) {
         let description = await this.actionSupport.getElementText("//div[@class='item py-3 px-4 ng-scope'][" + n + "]//div[@class='item-type mt-2 ng-scope']")
         let count = await browser.element.all(by.xpath(this.issueCommentModelXPath)).count()
@@ -587,34 +630,5 @@ export class ReportPage {
     
     async ViewProjectReport(){
         await this.actionSupport.clickOnElement("//li[text()='View Project Report']")
-    }
-    //show color of 
-    async CheckColorProgram(week, KPIname){
-        let redvalue = await this.actionSupport.getElementAttribute("//div[text()='"+ KPIname +"']//following-sibling::div["+ week +"]//set-width-data-array-directive", "red-value")
-        let greenvalue = await this.actionSupport.getElementAttribute("//div[text()='"+ KPIname +"']//following-sibling::div["+ week +"]//set-width-data-array-directive", "green-value")
-        let yellowvalue = await this.actionSupport.getElementAttribute("//div[text()='"+ KPIname +"']//following-sibling::div["+ week +"]//set-width-data-array-directive", "yellow-value")
-        let noblank = this.actionSupport.clickOnElement("//div[text()='" + KPIname + "']//following-sibling::div["+ week +"]")
-    }
-    async CheckColor(week, KPIname){
-        let red = 0, green = 0, yellow = 0
-        await this.actionSupport.clickOnElement("//li[text()='View Project Report']")
-        let colorproject = await this.actionSupport.getElementAttribute("//div[text()='"+ KPIname +"']//following-sibling::div["+ week +"]//div[contains(@class,'block-color w-100 h-100 ng-scope')]", "class")
-        let bg_color = colorproject.slice(33,42)
-        console.log(bg_color)
-        console.log(colorproject)
-        if(bg_color=="bg-red")
-            red += 1
-        if(bg_color=="bg-green")
-            green += 1
-        if(bg_color=="bg-yellow")
-            yellow += 1
-        console.log(red, green, yellow, bg_color)
-    }
-
-    async AddBusinessFromTable(row){
-        let addBtn = "//div[@ng-repeat='businessHighlight in businessOpportunityHighlightModals']["+ row +"]//button[text()='Add']"
-        let addAllBtn = "//button[text()='Add all']"
-        await this.actionSupport.clickOnElement(addBtn)
-        await expect(browser.element(by.xpath(addBtn)).isPresent()).toBe(false)
     }
 }

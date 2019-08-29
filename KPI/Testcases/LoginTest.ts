@@ -2,10 +2,12 @@ import { LoginPage } from "../PageObjects/LoginPage";
 import { async } from "q";
 import { browser } from "protractor";
 import { LogoutPage } from "../PageObjects/LogoutPage";
+import {dataBuilder} from "../core_function/dataBuilder";
 
 describe("Login Page ", function(){
     let loginPage: LoginPage
     let logoutPage: LogoutPage
+    let dataArray:Array<Map<string,string>>
 
     beforeEach(async function(){
         loginPage = new LoginPage(browser)
@@ -15,46 +17,39 @@ describe("Login Page ", function(){
         await browser.get("http://10.1.0.62/kpi/#/")
     })
 
-    it("Login successfully", async function(){
-        let username = "tttoai"
-        let password = "1234"
-        await loginPage.loginPage(username, password)
+    it("Login logout", async function(){
+        console.log("STEP 1: Login with valid username and password")
+        dataArray = await dataBuilder.readExcel(__dirname + "\\..\\TestData\\Login.xlsx", "Login", "TC01")
+        let email=dataArray[0].get("Email")
+        let password=dataArray[0].get("Password")
+        await loginPage.loginPage(email, password)
         await loginPage.loginSuccess()
+        console.log("STEP 2: Logout")
         await logoutPage.logoutPage()
         await logoutPage.logoutSuccess()
     })
     
     it("Login with username field is blank", async function(){
-        let username = ""
-        let password = "1234"
-        await loginPage.loginPage(username, password)
+        dataArray = await dataBuilder.readExcel(__dirname + "\\..\\TestData\\Login.xlsx", "Login", "TC02")
+        let email=dataArray[0].get("Email")
+        let password=dataArray[0].get("Password")
+        await loginPage.loginPage(email, password)
         await loginPage.loginWithoutUsername()
-        await browser.sleep(5000)
     })
 
     it("Login with password field is blank", async function(){
-        let username = "tttoai"
-        let password = ""
-        await loginPage.loginPage(username, password)
+        dataArray = await dataBuilder.readExcel(__dirname + "\\..\\TestData\\Login.xlsx", "Login", "TC03")
+        let email=dataArray[0].get("Email")
+        let password=dataArray[0].get("Password")
+        await loginPage.loginPage(email, password)
         await loginPage.loginWithoutPassword()
-        await browser.sleep(5000)
     })
 
     it("Login with incorrect username", async function(){
-        let username = "ttmaitram"
-        let password = "1234"
-        await loginPage.loginPage(username, password)
+        dataArray = await dataBuilder.readExcel(__dirname + "\\..\\TestData\\Login.xlsx", "Login", "TC04")
+        let email=dataArray[0].get("Email")
+        let password=dataArray[0].get("Password")
+        await loginPage.loginPage(email, password)
         await loginPage.loginWithIncorrectUsername("Invalid User")
-        await browser.sleep(5000)
-    })
-
-    fit("Login to KPI Dashboard successfully", async function(){
-        let titlepage = "//div[text()='Reports']"
-        
-        //automate each step
-        await loginPage.loginPage("tpphuoc", "1234")
-       
-        //verify result
-        await loginPage.VerifyProfileName("TRẦN PHÚ PHƯỚC")
     })
 })
