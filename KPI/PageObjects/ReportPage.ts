@@ -553,29 +553,6 @@ export class ReportPage {
             console.log("Delete button is disable")
     }
 
-    async EditIssueInModel(title, description, action) {
-
-        await this.actionSupport.sendKeysOnElement(this.modelTitleXPath, title)
-        await this.actionSupport.sendKeysOnElement(this.modelDescriptionXPath, description)
-        await this.actionSupport.sendKeysOnElement(this.modelActionXPath, action)
-        await this.actionSupport.clickOnElement(this.saveEditBtnXPath)
-        await expect(this.actionSupport.getElementText(this.addSuccessMsgXPath)).toEqual("Edited the issue successfully")
-        let el = await browser.element(by.xpath(this.addSuccessMsgXPath))
-        await browser.wait(ExpectedConditions.not(ExpectedConditions.presenceOf(el)))
-        console.log("Edit issue successfully")
-
-    }
-
-    async EditCommentInModel(title, description) {
-        await this.actionSupport.sendKeysOnElement(this.modelTitleXPath, title)
-        await this.actionSupport.sendKeysOnElement(this.modelDescriptionXPath, description)
-        await this.actionSupport.clickOnElement(this.saveEditBtnXPath)
-        await expect(this.actionSupport.getElementText(this.addSuccessMsgXPath)).toEqual("Edited the comment successfully")
-        let el = await browser.element(by.xpath(this.addSuccessMsgXPath))
-        await browser.wait(ExpectedConditions.not(ExpectedConditions.presenceOf(el)))
-        console.log("Edit comment successfully")
-    }
-
     async EditIssueCommentInModel(n, title, description, action) {
         let editBtn = "//div[@class='item py-3 px-4 ng-scope'][" + n + "]//div[@ng-click='editIssue(issue)']"
         let count = await this.CheckDisableEditDeleteBtn(n)
